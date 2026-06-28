@@ -1,0 +1,110 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Serif+SC:wght@300;500&family=Inter:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+html, body {
+  background-color: #08080a;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  backface-visibility: hidden;
+}
+
+#root {
+  background-color: #08080a;
+  min-height: 100vh;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.25s ease-out forwards;
+}
+
+@theme {
+  --font-sans: "Noto Serif SC", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Cinzel", serif;
+  
+  --color-gold: #b49157;
+  --color-gold-muted: rgba(180, 145, 87, 0.3);
+  --color-dark-bg: #08080a;
+  --color-dark-surface: #0c0c0e;
+  --color-dark-card: #16161a;
+}
+
+@layer utilities {
+  .golden-border {
+    border: 1px solid var(--color-gold-muted);
+  }
+  
+  .glow-gold {
+    box-shadow: 0 0 15px rgba(180, 145, 87, 0.15);
+  }
+  
+  .card-back-pattern {
+    background-image: radial-gradient(circle, #b49157 1px, transparent 1px);
+    background-size: 12px 12px;
+  }
+  
+  .gold-gradient {
+    background: linear-gradient(135deg, #b49157 0%, #8c6d39 100%);
+  }
+
+  .card-gradient {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  }
+}
+
+.markdown-body {
+  color: #d1d5db;
+  line-height: 1.8;
+  font-family: var(--font-sans);
+}
+
+.markdown-body h1, .markdown-body h2, .markdown-body h3 {
+  color: var(--color-gold);
+  font-family: var(--font-display);
+  font-weight: 700;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  letter-spacing: 0.05em;
+}
+
+.markdown-body p {
+  margin-bottom: 1.25rem;
+  opacity: 0.9;
+}
+
+.markdown-body ul {
+  list-style-type: none;
+  padding-left: 0;
+  margin-bottom: 1.25rem;
+}
+
+.markdown-body li {
+  margin-bottom: 0.75rem;
+  position: relative;
+  padding-left: 1.5rem;
+}
+
+.markdown-body li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.6em;
+  width: 0.5rem;
+  height: 0.5rem;
+  background-color: var(--color-gold);
+  transform: rotate(45deg);
+  opacity: 0.6;
+}

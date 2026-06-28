@@ -1,0 +1,39 @@
+# 依赖
+node_modules/
+
+# 构建输出
+dist/
+
+# 环境变量
+.env
+.env.local
+.env.*.local
+
+# 压缩包
+*.zip
+*.tar.gz
+*.tar
+
+# 备份
+backup_*.zip
+
+# 日志
+*.log
+npm-debug.log*
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 微信开发者工具
+wechat-devtools/
+
+# 嵌入的 git 仓库
+tarot-images/
+tarot-lab/

@@ -1,0 +1,6 @@
+{
+  "name": "AI灵境塔罗",
+  "description": "基于Gemini AI的深层塔罗占卜与命运解析，支持历史占卜记录回溯。",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}

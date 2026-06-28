@@ -1,0 +1,2903 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理后台 - 塔罗应用</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #08080a;
+            color: #d1d5db;
+            min-height: 100vh;
+        }
+
+        /* ======= Login Page ======= */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .login-box {
+            background: #0c0c0e;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 48px;
+            width: 100%;
+            max-width: 420px;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .login-header .icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .login-header h1 {
+            font-size: 24px;
+            color: #b49157;
+            margin-bottom: 8px;
+        }
+
+        .login-header p {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #9ca3af;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 16px;
+            background: #16161a;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #d1d5db;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            border-color: rgba(180, 145, 87, 0.5);
+            box-shadow: 0 0 0 3px rgba(180, 145, 87, 0.1);
+        }
+
+        .form-group input::placeholder {
+            color: #6b7280;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #b49157 0%, #8c6d39 100%);
+            border: none;
+            border-radius: 8px;
+            color: #000;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(180, 145, 87, 0.3);
+        }
+
+        .login-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .login-error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            text-align: center;
+            display: none;
+        }
+
+        .login-error.show {
+            display: block;
+        }
+
+        /* ======= Dashboard Layout ======= */
+        .dashboard-layout {
+            display: none;
+            min-height: 100vh;
+        }
+
+        .dashboard-layout.show {
+            display: flex;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 240px;
+            background: #0c0c0e;
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .sidebar-header {
+            padding: 24px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .sidebar-header h1 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #b49157;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 12px 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+            color: #9ca3af;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #d1d5db;
+        }
+
+        .nav-item.active {
+            background: rgba(180, 145, 87, 0.15);
+            color: #b49157;
+        }
+
+        .nav-item .nav-icon {
+            font-size: 18px;
+            width: 24px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .sidebar-footer {
+            padding: 16px 8px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .sidebar-footer .nav-item {
+            color: #6b7280;
+        }
+
+        .sidebar-footer .nav-item:hover {
+            color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        /* Main content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .main-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 32px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            background: #0a0a0c;
+        }
+
+        .main-header h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .main-header .header-time {
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .main-body {
+            flex: 1;
+            padding: 24px 32px;
+            overflow-y: auto;
+        }
+
+        .page-section {
+            display: none;
+        }
+
+        .page-section.active {
+            display: block;
+        }
+
+        /* ======= Overview / Dashboard Stats ======= */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: #0c0c0e;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.2s;
+        }
+
+        .stat-card:hover {
+            border-color: rgba(180, 145, 87, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .stat-card .stat-icon {
+            font-size: 28px;
+            margin-bottom: 12px;
+        }
+
+        .stat-card .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+
+        .stat-card .stat-label {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        /* Level distribution */
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .level-chart {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 32px;
+        }
+
+        .level-bar-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .level-bar-label {
+            width: 48px;
+            font-size: 13px;
+            color: #9ca3af;
+            flex-shrink: 0;
+        }
+
+        .level-bar-track {
+            flex: 1;
+            height: 24px;
+            background: #16161a;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .level-bar-fill {
+            height: 100%;
+            border-radius: 6px;
+            transition: width 0.8s ease;
+            display: flex;
+            align-items: center;
+            padding-left: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .level-bar-count {
+            width: 36px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #d1d5db;
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        /* Recent readings */
+        .readings-timeline {
+            background: #0c0c0e;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .reading-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            transition: background 0.15s;
+        }
+
+        .reading-item:last-child {
+            border-bottom: none;
+        }
+
+        .reading-item:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .reading-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #1a1a2e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            flex-shrink: 0;
+            font-size: 14px;
+        }
+
+        .reading-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .reading-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .reading-info .reading-user {
+            font-size: 13px;
+            font-weight: 500;
+            color: #fff;
+            margin-bottom: 2px;
+        }
+
+        .reading-info .reading-question {
+            font-size: 12px;
+            color: #6b7280;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .reading-time {
+            font-size: 12px;
+            color: #6b7280;
+            flex-shrink: 0;
+        }
+
+        /* ======= User Management ======= */
+        .search-box {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 15px 20px 15px 50px;
+            background: #16161a;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: #d1d5db;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .search-box input:focus {
+            border-color: rgba(180, 145, 87, 0.5);
+            box-shadow: 0 0 0 3px rgba(180, 145, 87, 0.1);
+        }
+
+        .search-box .icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6b7280;
+        }
+
+        .table-container {
+            background: #0c0c0e;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        th {
+            padding: 16px 20px;
+            text-align: left;
+            font-size: 13px;
+            font-weight: 600;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        td {
+            padding: 18px 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #1a1a2e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .avatar .default-icon {
+            font-size: 20px;
+        }
+
+        .avatar-editable {
+            cursor: pointer;
+        }
+
+        .avatar-editable:hover .avatar-overlay {
+            opacity: 1;
+        }
+
+        .avatar-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.2s;
+            border-radius: 50%;
+        }
+
+        .avatar-overlay svg {
+            width: 18px;
+            height: 18px;
+            color: white;
+        }
+
+        .avatar-delete-btn {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .avatar-delete-btn:hover {
+            background: rgba(239, 68, 68, 0.4);
+        }
+
+        .uploading-spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            vertical-align: middle;
+            margin-right: 4px;
+        }
+
+        .user-details {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .user-name {
+            font-size: 15px;
+            font-weight: 500;
+            color: #ffffff;
+        }
+
+        .user-id {
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .level-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .level-入门 { background: #4b5563; }
+        .level-学徒 { background: #059669; }
+        .level-进阶 { background: #2563eb; }
+        .level-资深 { background: #7c3aed; }
+        .level-大师 { background: #ca8a04; }
+
+        .readings-count {
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .date {
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .btn-edit {
+            background: rgba(180, 145, 87, 0.2);
+            color: #b49157;
+        }
+
+        .btn-edit:hover {
+            background: rgba(180, 145, 87, 0.3);
+        }
+
+        .btn-delete {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .btn-delete:hover {
+            background: rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-save {
+            background: #059669;
+            color: white;
+        }
+
+        .btn-save:hover {
+            background: #047857;
+        }
+
+        .btn-save:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-cancel {
+            background: #374151;
+            color: #d1d5db;
+        }
+
+        .btn-cancel:hover {
+            background: #4b5563;
+        }
+
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .pagination-info {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .page-btn {
+            padding: 8px 16px;
+            background: #16161a;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #d1d5db;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .page-btn:hover:not(:disabled) {
+            background: #1f1f24;
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .page-number {
+            padding: 8px 16px;
+            background: #16161a;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 60px 20px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(180, 145, 87, 0.2);
+            border-top-color: #b49157;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .empty {
+            text-align: center;
+            padding: 80px 20px;
+            color: #6b7280;
+        }
+
+        .empty .icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: #0c0c0e;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 450px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .modal .modal-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .modal h2 {
+            color: #ffffff;
+            font-size: 20px;
+            margin-bottom: 12px;
+        }
+
+        .modal p {
+            color: #9ca3af;
+            font-size: 14px;
+            margin-bottom: 28px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .edit-input {
+            width: 100%;
+            padding: 8px 12px;
+            background: #16161a;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            color: #d1d5db;
+            font-size: 14px;
+        }
+
+        .edit-row {
+            background: rgba(180, 145, 87, 0.05);
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 16px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 2000;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.3s;
+        }
+
+        .toast.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .toast-success {
+            background: rgba(5, 150, 105, 0.9);
+            color: white;
+        }
+
+        .toast-error {
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+        }
+
+        .unauthorized {
+            display: none;
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .unauthorized.show {
+            display: block;
+        }
+
+        .unauthorized h2 {
+            color: #ef4444;
+            margin-bottom: 16px;
+        }
+
+        .unauthorized p {
+            color: #9ca3af;
+            margin-bottom: 24px;
+        }
+
+        /* ======= Add User ======= */
+        .search-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            align-items: stretch;
+        }
+
+        .search-bar .search-box {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .btn-add {
+            padding: 0 20px;
+            background: linear-gradient(135deg, #b49157 0%, #8c6d39 100%);
+            color: #000;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-add:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(180, 145, 87, 0.3);
+        }
+
+        .form-row {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-row label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #9ca3af;
+        }
+
+        .form-row input,
+        .form-row select {
+            width: 100%;
+            padding: 10px 14px;
+            background: #16161a;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #d1d5db;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-row input:focus,
+        .form-row select:focus {
+            border-color: rgba(180, 145, 87, 0.5);
+        }
+
+        /* 词云样式 */
+        .wordcloud-container {
+            background: #0c0c0e;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 24px;
+            min-height: 350px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .wordcloud-word {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            position: absolute;
+            white-space: nowrap;
+        }
+
+        .wordcloud-word:hover {
+            transform: scale(1.2);
+            text-shadow: 0 0 10px rgba(180, 145, 87, 0.5);
+            z-index: 100;
+        }
+
+        /* 热门牌阵样式 */
+        .spreads-container {
+            background: #0c0c0e;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .spread-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .spread-item:last-child {
+            border-bottom: none;
+        }
+
+        .spread-rank {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin-right: 16px;
+            border-radius: 8px;
+        }
+
+        .spread-rank-1 {
+            background: linear-gradient(135deg, #ffd700, #ffb700);
+            color: #000;
+        }
+
+        .spread-rank-2 {
+            background: linear-gradient(135deg, #c0c0c0, #a8a8a8);
+            color: #000;
+        }
+
+        .spread-rank-3 {
+            background: linear-gradient(135deg, #cd7f32, #b8722d);
+            color: #fff;
+        }
+
+        .spread-rank-other {
+            background: rgba(255, 255, 255, 0.1);
+            color: #9ca3af;
+        }
+
+        .spread-info {
+            flex: 1;
+        }
+
+        .spread-name {
+            font-size: 16px;
+            font-weight: 500;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+
+        .spread-count {
+            font-size: 13px;
+            color: #9ca3af;
+        }
+
+        .spread-bar {
+            width: 120px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-left: 16px;
+        }
+
+        .spread-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #b49157, #d4b575);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <!-- ======= Login Page ======= -->
+    <div id="loginPage" class="login-container">
+        <div class="login-box">
+            <div class="login-header">
+                <div class="icon">🔐</div>
+                <h1>管理员登录</h1>
+                <p>请输入管理员凭证以访问管理后台</p>
+            </div>
+            
+            <div id="loginError" class="login-error"></div>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>用户名</label>
+                    <input type="text" id="username" placeholder="请输入用户名" required>
+                </div>
+                <div class="form-group">
+                    <label>密码</label>
+                    <input type="password" id="password" placeholder="请输入密码" required>
+                </div>
+                <button type="submit" class="login-btn" id="loginBtn">登录</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ======= Dashboard Layout ======= -->
+    <div id="dashboardLayout" class="dashboard-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1>
+                    <span>🔮</span>
+                    塔罗管理
+                </h1>
+            </div>
+            <nav class="sidebar-nav">
+                <button class="nav-item active" data-page="overview" onclick="switchPage('overview')">
+                    <span class="nav-icon">📊</span>
+                    总览
+                </button>
+                <button class="nav-item" data-page="users" onclick="switchPage('users')">
+                    <span class="nav-icon">👥</span>
+                    用户管理
+                </button>
+                <button class="nav-item" data-page="readings" onclick="switchPage('readings')">
+                    <span class="nav-icon">🔮</span>
+                    解读记录
+                </button>
+                <button class="nav-item" data-page="quotaDetail" onclick="switchPage('quotaDetail')">
+                    <span class="nav-icon">📋</span>
+                    额度明细
+                </button>
+            </nav>
+            <div class="sidebar-footer">
+                <button class="nav-item" onclick="logout()">
+                    <span class="nav-icon">🚪</span>
+                    退出登录
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="main-header">
+                <h2 id="pageTitle">总览</h2>
+                <span class="header-time" id="headerTime"></span>
+            </div>
+            <div class="main-body">
+                <!-- Overview Page -->
+                <div id="pageOverview" class="page-section active">
+                    <div class="stats-grid" id="statsGrid">
+                        <div class="stat-card">
+                            <div class="stat-icon">👤</div>
+                            <div class="stat-value" id="statTotalUsers">-</div>
+                            <div class="stat-label">总用户数</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">🔮</div>
+                            <div class="stat-value" id="statTotalReadings">-</div>
+                            <div class="stat-label">总占卜次数</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">✨</div>
+                            <div class="stat-value" id="statTodayUsers">-</div>
+                            <div class="stat-label">今日新增用户</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">📈</div>
+                            <div class="stat-value" id="statTodayReadings">-</div>
+                            <div class="stat-label">今日占卜次数</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">🔥</div>
+                            <div class="stat-value" id="statActiveUsers">-</div>
+                            <div class="stat-label">今日活跃用户</div>
+                        </div>
+                    </div>
+
+                    <div class="section-title">📊 用户等级分布</div>
+                    <div class="level-chart" id="levelChart"></div>
+
+                    <div class="section-title">🕐 最近占卜</div>
+                    <div class="readings-timeline" id="recentReadings">
+                        <div class="loading"><div class="spinner"></div></div>
+                    </div>
+                    
+                    <div class="section-title">☁️ 用户提问热词</div>
+                    <div class="wordcloud-container" id="wordcloudContainer">
+                        <div class="loading"><div class="spinner"></div></div>
+                    </div>
+                    
+                    <div class="section-title">🎴 热门牌阵排行</div>
+                    <div class="spreads-container" id="spreadsContainer">
+                        <div class="loading"><div class="spinner"></div></div>
+                    </div>
+                </div>
+
+                <!-- User Management Page -->
+                <div id="pageUsers" class="page-section">
+                    <div class="search-bar">
+                        <div class="search-box">
+                            <span class="icon">🔍</span>
+                            <input type="text" id="searchInput" placeholder="搜索用户昵称或 OpenID...">
+                        </div>
+                        <div style="display:flex;align-items:center;gap:24px;">
+                            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px;color:#e4e4e7;">
+                                <span>允许注册</span>
+                                <input type="checkbox" id="registerToggle" style="display:none;" onchange="toggleRegistration(this.checked)">
+                                <div style="width:44px;height:24px;background:#3f3f46;border-radius:12px;position:relative;transition:background 0.2s;flex-shrink:0;">
+                                    <div style="width:18px;height:18px;background:#a1a1aa;border-radius:50%;position:absolute;top:3px;left:3px;transition:all 0.2s;"></div>
+                                </div>
+                            </label>
+                            <button class="btn-add" onclick="openAddUserModal()">➕ 添加用户</button>
+                            <button class="btn-add" onclick="batchUpdateQuota()" style="background: #7c3aed; margin-left: 8px;">⚡ 批量更新额度</button>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <div id="tableLoading" class="loading">
+                            <div class="spinner"></div>
+                        </div>
+                        <table id="usersTable" style="display: none;">
+                            <thead>
+                                <tr>
+                                    <th>用户信息</th>
+                                    <th>等级</th>
+                                    <th>剩余额度</th>
+                                    <th>占卜次数</th>
+                                    <th>创建时间</th>
+                                    <th style="text-align: right;">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersBody">
+                            </tbody>
+                        </table>
+                        <div id="emptyState" class="empty" style="display: none;">
+                            <div class="icon">👥</div>
+                            <p>暂无用户数据</p>
+                        </div>
+                        <div id="unauthorized" class="unauthorized">
+                            <h2>未授权访问</h2>
+                            <p>您的登录已过期，请重新登录</p>
+                            <button class="login-btn" onclick="logout()">重新登录</button>
+                        </div>
+                        <div class="pagination">
+                            <div class="pagination-info" id="paginationInfo">共 0 条记录</div>
+                            <div class="pagination-controls">
+                                <button class="page-btn" id="prevBtn" disabled>上一页</button>
+                                <span class="page-number" id="pageNumber">1 / 1</span>
+                                <button class="page-btn" id="nextBtn" disabled>下一页</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Readings Page -->
+                <div id="pageReadings" class="page-section">
+                    <div class="filters-bar" style="display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; align-items: end;">
+                        <div style="flex: 1; min-width: 180px; position: relative;">
+                            <label style="display: block; font-size: 13px; color: #9ca3af; margin-bottom: 8px;">用户</label>
+                            <input type="text" id="filterUserSearch" placeholder="搜索用户..." autocomplete="off" style="width: 100%; padding: 10px 14px; background: #16161a; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #d1d5db;" onfocus="showUserDropdown()" oninput="filterUserDropdown()">
+                            <div id="userDropdown" style="display: none; position: absolute; top: 100%; left: 0; right: 0; max-height: 200px; overflow-y: auto; background: #16161a; border: 1px solid rgba(255,255,255,0.1); border-top: none; border-radius: 0 0 8px 8px; z-index: 100;">
+                                <div onclick="selectUser('', '全部用户')" style="padding: 10px 14px; cursor: pointer; color: #d1d5db;">全部用户</div>
+                            </div>
+                            <input type="hidden" id="filterUserId" value="">
+                        </div>
+                        <div style="flex: 1; min-width: 140px;">
+                            <label style="display: block; font-size: 13px; color: #9ca3af; margin-bottom: 8px;">开始日期</label>
+                            <input type="date" id="filterStartDate" style="width: 100%; padding: 10px 14px; background: #16161a; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #d1d5db;">
+                        </div>
+                        <div style="flex: 1; min-width: 140px;">
+                            <label style="display: block; font-size: 13px; color: #9ca3af; margin-bottom: 8px;">结束日期</label>
+                            <input type="date" id="filterEndDate" style="width: 100%; padding: 10px 14px; background: #16161a; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #d1d5db;">
+                        </div>
+                        <button class="btn btn-save" onclick="applyReadingsFilters()" style="padding: 10px 20px;">筛选</button>
+                        <button class="btn btn-cancel" onclick="resetReadingsFilters()" style="padding: 10px 20px;">重置</button>
+                    </div>
+
+                    <div class="readings-list" id="readingsList">
+                        <div id="readingsLoading" class="loading">
+                            <div class="spinner"></div>
+                        </div>
+                        <div id="readingsEmpty" class="empty" style="display: none;">
+                            <div class="icon">🔮</div>
+                            <p>暂无解读记录</p>
+                        </div>
+                        <div id="readingsItems" style="display: flex; flex-direction: column; gap: 16px;"></div>
+                    </div>
+
+                    <div class="pagination" id="readingsPagination" style="margin-top: 24px;">
+                        <div class="pagination-info" id="readingsPaginationInfo">共 0 条记录</div>
+                        <div class="pagination-controls">
+                            <button class="page-btn" id="readingsPrevBtn" disabled onclick="changeReadingsPage(-1)">上一页</button>
+                            <span class="page-number" id="readingsPageNumber">1 / 1</span>
+                            <button class="page-btn" id="readingsNextBtn" disabled onclick="changeReadingsPage(1)">下一页</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+                <!-- Quota Detail Page -->
+                <div id="pageQuotaDetail" class="page-section">
+                    <div class="search-bar" style="flex-wrap:wrap;gap:12px;">
+                        <div style="flex:1;min-width:260px;position:relative;">
+                            <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#9ca3af;">🔍</span>
+                            <input type="text" id="quotaDetailSearch" placeholder="搜索用户昵称或 OpenID..." autocomplete="off"
+                                style="width:100%;padding:12px 16px 12px 42px;background:#16161a;border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#fff;font-size:14px;outline:none;transition:all .2s;"
+                                onfocus="showQuotaDetailUserDropdown()" oninput="filterQuotaDetailUserDropdown()">
+                            <div id="quotaDetailUserDropdown" style="display:none;position:absolute;top:100%;left:0;right:0;margin-top:6px;max-height:240px;overflow-y:auto;background:#16161a;border:1px solid rgba(255,255,255,0.1);border-radius:8px;z-index:100;box-shadow:0 8px 24px rgba(0,0,0,0.4);">
+                                <div style="padding:12px 14px;color:#9ca3af;font-size:13px;">请先输入关键字搜索</div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="quotaDetailUserId" value="">
+                        <button class="btn" onclick="loadQuotaDetail()" style="padding:0 20px;height:44px;background:linear-gradient(135deg,#b49157 0%,#8c6d39 100%);color:#000;border:none;border-radius:8px;cursor:pointer;font-weight:500;white-space:nowrap;">
+                            查看明细
+                        </button>
+                    </div>
+
+                    <div id="quotaDetailLoading" class="loading" style="display:none;">
+                        <div class="spinner"></div>
+                    </div>
+
+                    <div id="quotaDetailEmpty" class="empty" style="display:none;">
+                        <div class="icon">📋</div>
+                        <p>请选择一个用户查看其额度使用明细</p>
+                    </div>
+
+                    <div id="quotaDetailContent" style="display:none;">
+                        <!-- 用户信息与额度概览 -->
+                        <div class="stats-grid" id="quotaStatsGrid"></div>
+
+                        <!-- 每日消耗 -->
+                        <div class="section-title" style="margin-top:24px;">📅 每日消耗记录</div>
+                        <div id="quotaDailyList"></div>
+
+                        <!-- 额度变动明细 -->
+                        <div class="section-title" style="margin-top:24px;">🧾 额度变动明细</div>
+                        <div class="table-container">
+                            <table id="quotaUsageTable">
+                                <thead>
+                                    <tr>
+                                        <th style="width:80px;">序号</th>
+                                        <th style="width:100px;">类型</th>
+                                        <th>占卜问题 / 描述</th>
+                                        <th style="width:220px;">卡牌</th>
+                                        <th style="width:180px;">时间</th>
+                                        <th style="width:80px;text-align:right;">额度</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="quotaUsageBody"></tbody>
+                            </table>
+                            <div id="quotaUsageEmpty" class="empty" style="display:none;">
+                                <div class="icon">📭</div>
+                                <p>该用户暂无额度变动记录</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </main>
+    </div>
+
+    <!-- ======= Delete Confirmation Modal ======= -->
+    <div class="modal-overlay" id="deleteModal">
+        <div class="modal">
+            <div class="modal-icon">⚠️</div>
+            <h2>确认删除</h2>
+            <p>删除后无法恢复，确定要删除该用户吗？</p>
+            <div class="modal-actions">
+                <button class="btn btn-cancel" id="cancelDeleteBtn">取消</button>
+                <button class="btn btn-delete" id="confirmDeleteBtn">删除</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ======= Add User Modal ======= -->
+     <div class="modal-overlay" id="addUserModal">
+         <div class="modal" style="text-align:left;max-width:480px;">
+             <div style="text-align:center;margin-bottom:24px;">
+                 <div class="modal-icon">👤</div>
+                 <h2>添加用户</h2>
+                 <p>创建一个新的用户</p>
+             </div>
+             <div class="form-row">
+                 <label>昵称 <span style="color:#ef4444">*</span></label>
+                 <input type="text" id="addUserNickname" placeholder="输入用户昵称">
+             </div>
+             <div class="form-row">
+                 <label>密码 <span style="color:#6b7280;font-weight:400;font-size:12px;">（选填，用于账号密码登录）</span></label>
+                 <input type="password" id="addUserPassword" placeholder="留空则默认密码 123456">
+             </div>
+             <div class="form-row">
+                 <label>OpenID <span style="color:#6b7280;font-weight:400;font-size:12px;">（选填，微信用户专用）</span></label>
+                 <input type="text" id="addUserOpenid" placeholder="留空则自动生成">
+             </div>
+             <div class="form-row">
+                 <label>等级</label>
+                 <select id="addUserLevel">
+                     <option value="入门">入门</option>
+                     <option value="学徒">学徒</option>
+                     <option value="进阶">进阶</option>
+                     <option value="资深">资深</option>
+                     <option value="大师">大师</option>
+                 </select>
+             </div>
+             <div class="modal-actions" style="margin-top:28px;">
+                 <button class="btn btn-cancel" onclick="closeAddUserModal()">取消</button>
+                 <button class="btn btn-save" id="confirmAddUserBtn" onclick="addUser()">创建用户</button>
+             </div>
+         </div>
+     </div>
+
+    <!-- ======= Toast Notification ======= -->
+    <div class="toast" id="toast"></div>
+
+    <!-- Hidden avatar file input -->
+    <input type="file" id="avatarFileInput" accept="image/jpeg,image/png,image/gif,image/webp" style="display:none">
+
+    <script>
+        const API_BASE = '';
+        let token = localStorage.getItem('adminToken') || '';
+        let users = [];
+        let filteredUsers = [];
+        let pagination = { page: 1, limit: 10, total: 0, pages: 1 };
+        let editingUserId = null;
+        let deletingUserId = null;
+        let selectedAvatarFile = null;
+        let avatarPreviewUrl = null;
+        let isUploadingAvatar = false;
+        let currentPage = 'overview';
+        // 解读记录相关变量
+        let allUsersList = [];
+        let readingsList = [];
+        let readingsPagination = { page: 1, limit: 20, total: 0, pages: 1 };
+        let readingsFilters = { userId: '', startDate: '', endDate: '' };
+
+        // DOM Elements
+        const loginPage = document.getElementById('loginPage');
+        const dashboardLayout = document.getElementById('dashboardLayout');
+        const loginForm = document.getElementById('loginForm');
+        const loginError = document.getElementById('loginError');
+        const loginBtn = document.getElementById('loginBtn');
+        const pageTitle = document.getElementById('pageTitle');
+        const searchInput = document.getElementById('searchInput');
+        const usersTable = document.getElementById('usersTable');
+        const usersBody = document.getElementById('usersBody');
+        const tableLoading = document.getElementById('tableLoading');
+        const emptyState = document.getElementById('emptyState');
+        const unauthorized = document.getElementById('unauthorized');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const pageNumber = document.getElementById('pageNumber');
+        const paginationInfo = document.getElementById('paginationInfo');
+        const deleteModal = document.getElementById('deleteModal');
+        const toast = document.getElementById('toast');
+
+        // ======= Page Routing =======
+        function switchPage(page) {
+            currentPage = page;
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.querySelector(`.nav-item[data-page="${page}"]`).classList.add('active');
+            document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active'));
+            document.getElementById(`page${page.charAt(0).toUpperCase() + page.slice(1)}`).classList.add('active');
+
+            const titles = { overview: '总览', users: '用户管理', readings: '解读记录', quotaDetail: '额度明细' };
+            pageTitle.textContent = titles[page] || '总览';
+
+            if (page === 'overview') {
+                fetchStats();
+            } else if (page === 'users') {
+                fetchUsers();
+                loadRegistrationConfig();
+            } else if (page === 'readings') {
+                loadAllUsersForFilter();
+                fetchReadings();
+            } else if (page === 'quotaDetail') {
+                // 如果已选择用户则直接加载
+                const presetUserId = document.getElementById('quotaDetailUserId').value;
+                if (presetUserId) {
+                    loadQuotaDetail();
+                } else {
+                    document.getElementById('quotaDetailContent').style.display = 'none';
+                    document.getElementById('quotaDetailLoading').style.display = 'none';
+                    document.getElementById('quotaDetailEmpty').style.display = 'block';
+                }
+            }
+        }
+
+        // ======= Auth =======
+        async function checkAuth() {
+            if (!token) {
+                showLogin();
+                return false;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/api/admin/verify`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                
+                if (data.valid) {
+                    showDashboard();
+                    return true;
+                } else {
+                    logout();
+                    return false;
+                }
+            } catch (error) {
+                console.error('验证失败:', error);
+                logout();
+                return false;
+            }
+        }
+
+        function showLogin() {
+            loginPage.style.display = 'flex';
+            dashboardLayout.classList.remove('show');
+        }
+
+        function showDashboard() {
+            loginPage.style.display = 'none';
+            dashboardLayout.classList.add('show');
+            updateHeaderTime();
+            setInterval(updateHeaderTime, 60000);
+            switchPage('overview');
+        }
+
+        function updateHeaderTime() {
+            const now = new Date();
+            document.getElementById('headerTime').textContent = now.toLocaleString('zh-CN', {
+                year: 'numeric', month: '2-digit', day: '2-digit',
+                hour: '2-digit', minute: '2-digit'
+            });
+        }
+
+        async function login(username, password) {
+            try {
+                const response = await fetch(`${API_BASE}/api/admin/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    token = data.token;
+                    localStorage.setItem('adminToken', token);
+                    loginError.classList.remove('show');
+                    showDashboard();
+                    showToast('登录成功');
+                } else {
+                    loginError.textContent = data.error || '登录失败';
+                    loginError.classList.add('show');
+                }
+            } catch (error) {
+                console.error('登录错误:', error);
+                loginError.textContent = '网络错误，请稍后重试';
+                loginError.classList.add('show');
+            }
+        }
+
+        function logout() {
+            if (token) {
+                fetch(`${API_BASE}/api/admin/logout`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                }).catch(() => {});
+            }
+            token = '';
+            localStorage.removeItem('adminToken');
+            showLogin();
+        }
+
+        function showToast(message, type = 'success') {
+            toast.textContent = message;
+            toast.className = `toast toast-${type} active`;
+            setTimeout(() => {
+                toast.classList.remove('active');
+            }, 3000);
+        }
+
+        // ======= Stats =======
+        async function fetchStats() {
+            try {
+                document.getElementById('statsGrid').querySelectorAll('.stat-value').forEach(el => el.textContent = '-');
+
+                const response = await fetch(`${API_BASE}/api/admin/stats`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.status === 401) {
+                    logout();
+                    return;
+                }
+
+                const data = await response.json();
+                if (!data.success) return;
+
+                const stats = data.stats;
+                document.getElementById('statTotalUsers').textContent = stats.totalUsers;
+                document.getElementById('statTotalReadings').textContent = stats.totalReadings;
+                document.getElementById('statTodayUsers').textContent = stats.todayUsers;
+                document.getElementById('statTodayReadings').textContent = stats.todayReadings;
+                document.getElementById('statActiveUsers').textContent = stats.activeUsersToday;
+
+                renderLevelChart(stats.levelDistribution);
+                renderRecentReadings(stats.recentReadings);
+                renderPopularSpreads(stats.popularSpreads);
+                fetchWordCloud();
+            } catch (error) {
+                console.error('获取统计数据失败:', error);
+            }
+        }
+
+        async function fetchWordCloud() {
+            try {
+                const container = document.getElementById('wordcloudContainer');
+                container.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+
+                const response = await fetch(`${API_BASE}/api/admin/wordcloud`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.status === 401) {
+                    logout();
+                    return;
+                }
+
+                const data = await response.json();
+                if (!data.success) {
+                    container.innerHTML = '<div class="empty"><p>暂无数据</p></div>';
+                    return;
+                }
+
+                renderWordCloud(data.wordcloud);
+            } catch (error) {
+                console.error('获取词云数据失败:', error);
+                const container = document.getElementById('wordcloudContainer');
+                container.innerHTML = '<div class="empty"><p>获取数据失败</p></div>';
+            }
+        }
+
+        function renderWordCloud(words) {
+            const container = document.getElementById('wordcloudContainer');
+            
+            if (!words || words.length === 0) {
+                container.innerHTML = '<div class="empty"><p>暂无词云数据</p></div>';
+                return;
+            }
+
+            const colors = [
+                '#b49157', '#ca8a04', '#eab308', '#f59e0b', '#f97316',
+                '#ec4899', '#8b5cf6', '#6366f1', '#3b82f6', '#0ea5e9',
+                '#06b6d4', '#14b8a6', '#22c55e', '#84cc16', '#a3e635'
+            ];
+
+            const counts = words.map(w => w.count);
+            const minCount = Math.min(...counts);
+            const maxCount = Math.max(...counts);
+            const minFontSize = 14;
+            const maxFontSize = 48;
+
+            container.innerHTML = '';
+            
+            // 获取容器尺寸
+            const containerRect = container.getBoundingClientRect();
+            const containerWidth = containerRect.width || 600;
+            const containerHeight = 300;
+            const centerX = containerWidth / 2;
+            const centerY = containerHeight / 2;
+
+            // 记录已放置的词的边界框
+            const placedBoxes = [];
+
+            // 检测两个矩形是否重叠
+            function boxesOverlap(box1, box2, padding = 5) {
+                return !(box1.x2 < box2.x1 - padding || 
+                         box1.x1 > box2.x2 + padding || 
+                         box1.y2 < box2.y1 - padding || 
+                         box1.y1 > box2.y2 + padding);
+            }
+
+            // 检测新位置是否与已放置的词重叠
+            function checkCollision(newBox) {
+                for (const box of placedBoxes) {
+                    if (boxesOverlap(newBox, box)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            // 随机搜索找到不重叠的位置
+            function findPosition(wordWidth, wordHeight, preferredDistance) {
+                const maxAttempts = 600;
+                
+                // 先在首选距离附近随机尝试
+                for (let attempt = 0; attempt < 200; attempt++) {
+                    const randomAngle = Math.random() * Math.PI * 2;
+                    const randomDistance = preferredDistance + (Math.random() - 0.5) * 80;
+                    
+                    const x = centerX + Math.cos(randomAngle) * randomDistance - wordWidth / 2;
+                    const y = centerY + Math.sin(randomAngle) * randomDistance - wordHeight / 2;
+                    
+                    if (x < 10 || y < 10 || x + wordWidth > containerWidth - 10 || y + wordHeight > containerHeight - 10) {
+                        continue;
+                    }
+                    
+                    const newBox = {
+                        x1: x,
+                        y1: y,
+                        x2: x + wordWidth,
+                        y2: y + wordHeight
+                    };
+                    
+                    if (!checkCollision(newBox)) {
+                        return { x, y, box: newBox };
+                    }
+                }
+                
+                // 如果找不到，扩大搜索范围到整个区域
+                for (let attempt = 0; attempt < 400; attempt++) {
+                    const x = 10 + Math.random() * (containerWidth - wordWidth - 20);
+                    const y = 10 + Math.random() * (containerHeight - wordHeight - 20);
+                    
+                    const newBox = {
+                        x1: x,
+                        y1: y,
+                        x2: x + wordWidth,
+                        y2: y + wordHeight
+                    };
+                    
+                    if (!checkCollision(newBox)) {
+                        return { x, y, box: newBox };
+                    }
+                }
+                
+                return null; // 找不到位置
+            }
+
+            // 估计词的宽度和高度
+            function estimateWordSize(word, fontSize) {
+                // 粗略估计：每个中文字符宽度约等于字号，英文约0.6倍
+                let width = 0;
+                for (const char of word) {
+                    if (/[\u4e00-\u9fa5]/.test(char)) {
+                        width += fontSize;
+                    } else {
+                        width += fontSize * 0.6;
+                    }
+                }
+                return {
+                    width: width + 4, // 加一点padding
+                    height: fontSize + 4
+                };
+            }
+
+            // 创建词元素并计算样式
+            const wordElements = words.map((item, index) => {
+                let ratio;
+                if (maxCount === minCount) {
+                    ratio = 0.5;
+                } else {
+                    const logMin = Math.log(minCount);
+                    const logMax = Math.log(maxCount);
+                    const logCount = Math.log(item.count);
+                    ratio = (logCount - logMin) / (logMax - logMin);
+                }
+                
+                const fontSize = minFontSize + ratio * (maxFontSize - minFontSize);
+                const color = colors[index % colors.length];
+                const opacity = 0.6 + ratio * 0.4;
+                const size = estimateWordSize(item.word, fontSize);
+                
+                return {
+                    word: item.word,
+                    count: item.count,
+                    fontSize,
+                    color,
+                    opacity,
+                    width: size.width,
+                    height: size.height,
+                    ratio,
+                    isLargest: index === 0
+                };
+            });
+
+            // 先放置最大的词在中间
+            const largestWord = wordElements[0];
+            const largestSpan = document.createElement('span');
+            largestSpan.className = 'wordcloud-word';
+            largestSpan.textContent = largestWord.word;
+            largestSpan.title = `${largestWord.word} (${largestWord.count}次)`;
+            largestSpan.style.fontSize = `${largestWord.fontSize}px`;
+            largestSpan.style.color = largestWord.color;
+            largestSpan.style.opacity = largestWord.opacity;
+            largestSpan.style.fontWeight = 'bold';
+            
+            const largestX = centerX - largestWord.width / 2;
+            const largestY = centerY - largestWord.height / 2;
+            largestSpan.style.left = `${largestX}px`;
+            largestSpan.style.top = `${largestY}px`;
+            largestSpan.style.zIndex = '50';
+            
+            container.appendChild(largestSpan);
+            
+            // 记录最大词的位置
+            placedBoxes.push({
+                x1: largestX,
+                y1: largestY,
+                x2: largestX + largestWord.width,
+                y2: largestY + largestWord.height
+            });
+
+            // 放置其他词
+            const otherWords = wordElements.slice(1);
+            for (const item of otherWords) {
+                // 首选距离：频率高的离中心近
+                const preferredDistance = 20 + (1 - item.ratio) * 120;
+                
+                // 寻找位置
+                const position = findPosition(item.width, item.height, preferredDistance);
+                
+                if (position) {
+                    const span = document.createElement('span');
+                    span.className = 'wordcloud-word';
+                    span.textContent = item.word;
+                    span.title = `${item.word} (${item.count}次)`;
+                    span.style.fontSize = `${item.fontSize}px`;
+                    span.style.color = item.color;
+                    span.style.opacity = item.opacity;
+                    span.style.left = `${position.x}px`;
+                    span.style.top = `${position.y}px`;
+                    span.style.zIndex = Math.floor(10 + item.ratio * 30);
+                    
+                    container.appendChild(span);
+                    placedBoxes.push(position.box);
+                }
+                // 如果找不到位置就跳过这个词
+            }
+        }
+
+        function renderLevelChart(levels) {
+            const chart = document.getElementById('levelChart');
+            if (!levels || levels.length === 0) {
+                chart.innerHTML = '<div class="empty"><p>暂无数据</p></div>';
+                return;
+            }
+
+            const maxCount = Math.max(...levels.map(l => l.count));
+            const levelColors = {
+                '入门': '#4b5563',
+                '学徒': '#059669',
+                '进阶': '#2563eb',
+                '资深': '#7c3aed',
+                '大师': '#ca8a04'
+            };
+
+            chart.innerHTML = levels.map(l => {
+                const pct = maxCount > 0 ? (l.count / maxCount * 100) : 0;
+                const color = levelColors[l.level] || '#4b5563';
+                return `
+                    <div class="level-bar-row">
+                        <div class="level-bar-label">${l.level}</div>
+                        <div class="level-bar-track">
+                            <div class="level-bar-fill" style="width:${pct}%;background:${color}">${l.count > 0 ? l.count : ''}</div>
+                        </div>
+                        <div class="level-bar-count">${l.count}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderRecentReadings(readings) {
+            const container = document.getElementById('recentReadings');
+            if (!readings || readings.length === 0) {
+                container.innerHTML = '<div class="empty"><p>暂无占卜记录</p></div>';
+                return;
+            }
+
+            container.innerHTML = readings.map(r => `
+                <div class="reading-item">
+                    <div class="reading-avatar">
+                        ${r.avatar ? `<img src="${r.avatar}" alt="${r.nickname || '用户'}">` : '👤'}
+                    </div>
+                    <div class="reading-info">
+                        <div class="reading-user">${r.nickname || '匿名用户'}</div>
+                        <div class="reading-question">占卜 ${r.count} 次</div>
+                    </div>
+                    <div class="reading-time">${formatDate(r.lastReadAt)}</div>
+                </div>
+            `).join('');
+        }
+
+        function renderPopularSpreads(spreads) {
+            const container = document.getElementById('spreadsContainer');
+            if (!spreads || spreads.length === 0) {
+                container.innerHTML = '<div class="empty"><p>暂无牌阵数据</p></div>';
+                return;
+            }
+
+            const maxCount = Math.max(...spreads.map(s => s.count));
+
+            container.innerHTML = spreads.map((spread, index) => {
+                const rank = index + 1;
+                let rankClass = 'spread-rank-other';
+                if (rank === 1) rankClass = 'spread-rank-1';
+                else if (rank === 2) rankClass = 'spread-rank-2';
+                else if (rank === 3) rankClass = 'spread-rank-3';
+
+                const percentage = maxCount > 0 ? (spread.count / maxCount * 100) : 0;
+
+                return `
+                    <div class="spread-item">
+                        <div class="spread-rank ${rankClass}">${rank}</div>
+                        <div class="spread-info">
+                            <div class="spread-name">${spread.name}</div>
+                            <div class="spread-count">使用 ${spread.count} 次</div>
+                        </div>
+                        <div class="spread-bar">
+                            <div class="spread-bar-fill" style="width: ${percentage}%"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ======= User Management =======
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('zh-CN', {
+                year: 'numeric', month: '2-digit', day: '2-digit',
+                hour: '2-digit', minute: '2-digit'
+            });
+        }
+
+        async function fetchUsers() {
+            try {
+                tableLoading.style.display = 'flex';
+                usersTable.style.display = 'none';
+                emptyState.style.display = 'none';
+                unauthorized.classList.remove('show');
+
+                const response = await fetch(`${API_BASE}/api/admin/users?page=${pagination.page}&limit=${pagination.limit}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.status === 401) {
+                    unauthorized.classList.add('show');
+                    showToast('登录已过期', 'error');
+                    return;
+                }
+
+                const data = await response.json();
+
+                if (data.success) {
+                    users = data.users;
+                    pagination = data.pagination;
+                    filterUsers();
+                } else {
+                    showToast(data.error || '获取用户列表失败', 'error');
+                }
+            } catch (error) {
+                console.error('获取用户列表失败:', error);
+                showToast('网络错误，请稍后重试', 'error');
+            } finally {
+                tableLoading.style.display = 'none';
+            }
+        }
+
+        async function loadRegistrationConfig() {
+            try {
+                const response = await fetch(`${API_BASE}/api/admin/config`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                if (data.success && data.config) {
+                    const toggle = document.getElementById('registerToggle');
+                    const enabled = data.config.registrationEnabled !== false;
+                    toggle.checked = enabled;
+                    updateToggleUI(enabled);
+                }
+            } catch (error) {
+                console.error('获取注册配置失败:', error);
+            }
+        }
+
+        function updateToggleUI(enabled) {
+            const label = document.querySelector('label[for="registerToggle"]') || document.getElementById('registerToggle').closest('label');
+            const toggleOuter = label.querySelector('div');
+            const toggleInner = toggleOuter.querySelector('div');
+            toggleOuter.style.background = enabled ? '#22c55e' : '#3f3f46';
+            toggleInner.style.background = enabled ? '#fff' : '#a1a1aa';
+            toggleInner.style.transform = enabled ? 'translateX(20px)' : 'translateX(3px)';
+        }
+
+        async function toggleRegistration(enabled) {
+            updateToggleUI(enabled);
+            try {
+                const response = await fetch(`${API_BASE}/api/admin/config`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ config: { registrationEnabled: enabled } })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    showToast(enabled ? '注册通道已开启' : '注册通道已关闭', 'success');
+                }
+            } catch (error) {
+                console.error('保存注册配置失败:', error);
+                showToast('保存失败', 'error');
+                document.getElementById('registerToggle').checked = !enabled;
+                updateToggleUI(!enabled);
+            }
+        }
+
+        function filterUsers() {
+            const searchTerm = searchInput.value.toLowerCase();
+            filteredUsers = users.filter(user => 
+                user.nickname.toLowerCase().includes(searchTerm) ||
+                user.openid.toLowerCase().includes(searchTerm)
+            );
+            renderUsers();
+        }
+
+        function renderUsers() {
+            if (filteredUsers.length === 0 && users.length === 0) {
+                usersTable.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            usersTable.style.display = 'table';
+            emptyState.style.display = 'none';
+            paginationInfo.textContent = `共 ${pagination.total} 条记录`;
+            pageNumber.textContent = `${pagination.page} / ${pagination.pages}`;
+            prevBtn.disabled = pagination.page <= 1;
+            nextBtn.disabled = pagination.page >= pagination.pages;
+
+            usersBody.innerHTML = filteredUsers.map(user => `
+                <tr id="user-${user.id}" class="${editingUserId === user.id ? 'edit-row' : ''}">
+                    <td>
+                        <div class="user-info">
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <div class="avatar ${editingUserId === user.id ? 'avatar-editable' : ''}" ${editingUserId === user.id ? 'onclick="document.getElementById(\'avatarFileInput\').click()"' : ''}>
+                                    ${editingUserId === user.id && avatarPreviewUrl ? `<img src="${avatarPreviewUrl}" alt="${user.nickname}">` : editingUserId === user.id && !avatarPreviewUrl ? '<span class="default-icon">📷</span>' : user.avatar ? `<img src="${user.avatar}" alt="${user.nickname}">` : '<span class="default-icon">👤</span>'}
+                                    ${editingUserId === user.id ? `<div class="avatar-overlay"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg></div>` : ''}
+                                </div>
+                                ${editingUserId === user.id && (avatarPreviewUrl || user.avatar) ? `<button class="avatar-delete-btn" onclick="deleteAvatar()" title="删除头像"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>` : ''}
+                            </div>
+                            <div class="user-details">
+                                ${editingUserId === user.id ? `<input class="edit-input" id="nickname-${user.id}" value="${user.nickname}" style="margin-bottom:4px">` : `<div class="user-name">${user.nickname}</div>`}
+                                <div class="user-id">${user.openid.substring(0, 12)}...</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        ${editingUserId === user.id ? `
+                            <div style="display:flex;flex-direction:column;gap:8px;">
+                                <select class="edit-input" id="level-${user.id}">
+                                    ${['入门', '学徒', '进阶', '资深', '大师'].map(level => 
+                                        `<option value="${level}" ${user.level === level ? 'selected' : ''}>${level}</option>`
+                                    ).join('')}
+                                </select>
+                                <label style="display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer;">
+                                    <input type="checkbox" id="adjustQuota-${user.id}" checked>
+                                    <span>调整额度为对应等级标准</span>
+                                </label>
+                            </div>
+                        ` : `
+                            <span class="level-badge level-${user.level}">${user.level}</span>
+                        `}
+                    </td>
+                    <td>
+                        <span onclick="openQuotaDetailForUser('${user.id}','${String(user.nickname || '').replace(/'/g, "\\'")}')" style="color: ${user.draw_quota !== undefined && user.draw_quota < 5 ? '#ef4444' : '#b49157'}; font-weight:600;cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:2px;">
+                            ${user.draw_quota !== undefined ? user.draw_quota : '-'}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="readings-count">${user.readings}</span>
+                    </td>
+                    <td>
+                        <span class="date">${formatDate(user.createdAt)}</span>
+                    </td>
+                    <td>
+                        <div class="actions">
+                            ${editingUserId === user.id ? `
+                                <button class="btn btn-save" onclick="saveUser('${user.id}')" ${isUploadingAvatar ? 'disabled' : ''}>${isUploadingAvatar ? '<span class="uploading-spinner"></span>上传中' : '✓ 保存'}</button>
+                                <button class="btn btn-cancel" onclick="cancelEdit()">✗ 取消</button>
+                            ` : `
+                                <button class="btn btn-edit" onclick="startEdit('${user.id}')">✏️ 编辑</button>
+                                <button class="btn btn-edit" onclick="openQuotaDetailForUser('${user.id}','${String(user.nickname || '').replace(/'/g, "\\'")}')" style="background:rgba(124,58,237,.1);color:#b794f4;">📋 额度明细</button>
+                                <button class="btn btn-delete" onclick="confirmDelete('${user.id}')">🗑️ 删除</button>
+                            `}
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function startEdit(userId) {
+            editingUserId = userId;
+            const user = users.find(u => u.id === userId);
+            avatarPreviewUrl = user.avatar || null;
+            selectedAvatarFile = null;
+            renderUsers();
+        }
+
+        function cancelEdit() {
+            editingUserId = null;
+            avatarPreviewUrl = null;
+            selectedAvatarFile = null;
+            document.getElementById('avatarFileInput').value = '';
+            renderUsers();
+        }
+
+        function deleteAvatar() {
+            selectedAvatarFile = null;
+            avatarPreviewUrl = null;
+            document.getElementById('avatarFileInput').value = '';
+            renderUsers();
+        }
+
+        async function saveUser(userId) {
+            const levelSelect = document.getElementById(`level-${userId}`);
+            const nicknameInput = document.getElementById(`nickname-${userId}`);
+            const adjustQuotaCheckbox = document.getElementById(`adjustQuota-${userId}`);
+            const newLevel = levelSelect.value;
+            const newNickname = nicknameInput ? nicknameInput.value : undefined;
+            const adjustQuota = adjustQuotaCheckbox ? adjustQuotaCheckbox.checked : false;
+
+            try {
+                let avatarUrl = users.find(u => u.id === userId)?.avatar || '';
+
+                if (selectedAvatarFile) {
+                    isUploadingAvatar = true;
+                    renderUsers();
+                    const formData = new FormData();
+                    formData.append('avatar', selectedAvatarFile);
+                    const uploadRes = await fetch(`${API_BASE}/api/admin/upload-avatar`, {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${token}` },
+                        body: formData
+                    });
+                    const uploadData = await uploadRes.json();
+                    if (uploadData.success) {
+                        avatarUrl = uploadData.avatarUrl;
+                    }
+                    isUploadingAvatar = false;
+                } else if (avatarPreviewUrl === null && selectedAvatarFile === null) {
+                    const originalAvatar = users.find(u => u.id === userId)?.avatar;
+                    avatarUrl = originalAvatar ? '' : avatarUrl;
+                }
+
+                const user = users.find(u => u.id === userId);
+                const response = await fetch(`${API_BASE}/api/admin/users/${userId}`, {
+                    method: 'PUT',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        nickname: newNickname || user.nickname,
+                        level: newLevel,
+                        avatar: avatarUrl,
+                        adjustQuota: adjustQuota
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    user.level = newLevel;
+                    user.nickname = newNickname || user.nickname;
+                    user.avatar = avatarUrl;
+                    if (data.user && data.user.draw_quota !== undefined) {
+                        user.draw_quota = data.user.draw_quota;
+                    }
+                    editingUserId = null;
+                    avatarPreviewUrl = null;
+                    selectedAvatarFile = null;
+                    renderUsers();
+                    showToast('用户信息已更新');
+                } else {
+                    showToast('更新失败', 'error');
+                }
+            } catch (error) {
+                console.error('更新用户失败:', error);
+                isUploadingAvatar = false;
+                showToast('网络错误，请稍后重试', 'error');
+            }
+        }
+
+        async function batchUpdateQuota() {
+            const override = confirm('确定要批量更新所有用户的额度吗？\n\n这将为所有额度为0或空的用户设置对应等级的默认额度：\n- 入门: 10次\n- 学徒: 20次\n- 进阶: 35次\n- 资深: 50次\n- 大师: 100次\n\n⚠️ 是否覆盖已有额度的用户？\n点击「确定」覆盖所有用户，点击「取消」只更新额度为0的用户');
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/admin/users/batch-update-quota`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ override: override })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    showToast(data.message);
+                    // 刷新用户列表
+                    fetchUsers();
+                    
+                    // 显示详细更新信息
+                    if (data.details && data.details.length > 0) {
+                        console.log('额度更新详情:', data.details);
+                        let detailsText = data.details.slice(0, 5).map(u => 
+                            `${u.nickname}: ${u.newQuota}次`
+                        ).join('\n');
+                        if (data.details.length > 5) {
+                            detailsText += `\n...还有 ${data.details.length - 5} 个用户`;
+                        }
+                        alert(`已更新的用户：\n\n${detailsText}`);
+                    }
+                } else {
+                    showToast('批量更新失败', 'error');
+                }
+            } catch (error) {
+                console.error('批量更新失败:', error);
+                showToast('网络错误，请稍后重试', 'error');
+            }
+        }
+
+        function confirmDelete(userId) {
+            deletingUserId = userId;
+            deleteModal.classList.add('active');
+        }
+
+        async function deleteUser() {
+            if (!deletingUserId) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/api/admin/users/${deletingUserId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    users = users.filter(u => u.id !== deletingUserId);
+                    deletingUserId = null;
+                    deleteModal.classList.remove('active');
+                    filterUsers();
+                    showToast('用户已删除');
+                } else {
+                    showToast('删除失败', 'error');
+                }
+            } catch (error) {
+                console.error('删除用户失败:', error);
+                showToast('网络错误，请稍后重试', 'error');
+            }
+        }
+
+        // ======= Add User =======
+        function openAddUserModal() {
+            document.getElementById('addUserOpenid').value = '';
+            document.getElementById('addUserNickname').value = '';
+            document.getElementById('addUserPassword').value = '';
+            document.getElementById('addUserLevel').value = '入门';
+            document.getElementById('addUserModal').classList.add('active');
+            document.getElementById('confirmAddUserBtn').disabled = false;
+            document.getElementById('confirmAddUserBtn').textContent = '创建用户';
+            setTimeout(() => document.getElementById('addUserNickname').focus(), 100);
+        }
+
+        function closeAddUserModal() {
+            document.getElementById('addUserModal').classList.remove('active');
+        }
+
+        async function addUser() {
+            const openid = document.getElementById('addUserOpenid').value.trim();
+            const nickname = document.getElementById('addUserNickname').value.trim();
+            const password = document.getElementById('addUserPassword').value;
+            const level = document.getElementById('addUserLevel').value;
+
+            if (!nickname) {
+                showToast('请输入昵称', 'error');
+                document.getElementById('addUserNickname').focus();
+                return;
+            }
+
+            const btn = document.getElementById('confirmAddUserBtn');
+            btn.disabled = true;
+            btn.textContent = '创建中...';
+
+            try {
+                const response = await fetch(`${API_BASE}/api/admin/users`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        openid: openid || undefined,
+                        nickname,
+                        password: password || undefined,
+                        level
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    closeAddUserModal();
+                    showToast('用户创建成功');
+                    if (currentPage === 'users') {
+                        fetchUsers();
+                    }
+                } else {
+                    showToast(data.error || '创建失败', 'error');
+                    btn.disabled = false;
+                    btn.textContent = '创建用户';
+                }
+            } catch (error) {
+                console.error('创建用户失败:', error);
+                showToast('网络错误，请稍后重试', 'error');
+                btn.disabled = false;
+                btn.textContent = '创建用户';
+            }
+        }
+
+        // ======= Event Listeners =======
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            loginBtn.disabled = true;
+            loginBtn.textContent = '登录中...';
+            await login(username, password);
+            loginBtn.disabled = false;
+            loginBtn.textContent = '登录';
+        });
+
+        searchInput.addEventListener('input', filterUsers);
+
+        prevBtn.addEventListener('click', () => {
+            if (pagination.page > 1) {
+                pagination.page--;
+                fetchUsers();
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (pagination.page < pagination.pages) {
+                pagination.page++;
+                fetchUsers();
+            }
+        });
+
+        document.getElementById('cancelDeleteBtn').addEventListener('click', () => {
+            deletingUserId = null;
+            deleteModal.classList.remove('active');
+        });
+
+        document.getElementById('confirmDeleteBtn').addEventListener('click', deleteUser);
+
+        deleteModal.addEventListener('click', (e) => {
+            if (e.target === deleteModal) {
+                deletingUserId = null;
+                deleteModal.classList.remove('active');
+            }
+        });
+
+        document.getElementById('avatarFileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            if (!file.type.startsWith('image/')) {
+                showToast('请选择图片文件', 'error');
+                return;
+            }
+
+            if (file.size > 5 * 1024 * 1024) {
+                showToast('图片大小不能超过5MB', 'error');
+                return;
+            }
+
+            selectedAvatarFile = file;
+            const reader = new FileReader();
+            reader.onloadend = function() {
+                avatarPreviewUrl = reader.result;
+                renderUsers();
+            };
+            reader.readAsDataURL(file);
+            this.value = '';
+        });
+
+        document.getElementById('addUserModal').addEventListener('click', function(e) {
+            if (e.target === this) closeAddUserModal();
+        });
+
+        document.getElementById('addUserNickname').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') document.getElementById('addUserPassword').focus();
+        });
+
+        document.getElementById('addUserPassword').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') document.getElementById('addUserOpenid').focus();
+        });
+
+        document.getElementById('addUserOpenid').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') addUser();
+        });
+
+        // ======= Readings Management =======
+        async function loadAllUsersForFilter() {
+            try {
+                const response = await fetch(`${API_BASE}/api/admin/all-users`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.status === 401) {
+                    logout();
+                    return;
+                }
+
+                const data = await response.json();
+                if (data.success) {
+                    allUsersList = data.users;
+                    renderUserDropdown(allUsersList);
+                }
+            } catch (error) {
+                console.error('加载用户列表失败:', error);
+            }
+        }
+
+        function renderUserDropdown(users) {
+            const dropdown = document.getElementById('userDropdown');
+            let html = '<div onclick="selectUser(\'\', \'全部用户\')" onmouseover="this.style.backgroundColor=\'rgba(180,145,87,0.2)\'" onmouseout="this.style.backgroundColor=\'transparent\'" style="padding: 10px 14px; cursor: pointer; color: #d1d5db;">全部用户</div>';
+            html += users.map(u => `<div onclick="selectUser('${u.id}', '${u.nickname}')" onmouseover="this.style.backgroundColor='rgba(180,145,87,0.2)'" onmouseout="this.style.backgroundColor='transparent'" style="padding: 10px 14px; cursor: pointer; color: #d1d5db;">${u.nickname}</div>`).join('');
+            dropdown.innerHTML = html;
+        }
+
+        function showUserDropdown() {
+            document.getElementById('userDropdown').style.display = 'block';
+            filterUserDropdown();
+        }
+
+        function hideUserDropdown() {
+            document.getElementById('userDropdown').style.display = 'none';
+        }
+
+        function filterUserDropdown() {
+            const searchTerm = document.getElementById('filterUserSearch').value.toLowerCase();
+            const filteredUsers = allUsersList.filter(u => u.nickname.toLowerCase().includes(searchTerm));
+            renderUserDropdown(filteredUsers);
+            document.getElementById('userDropdown').style.display = 'block';
+        }
+
+        function selectUser(userId, nickname) {
+            document.getElementById('filterUserId').value = userId;
+            document.getElementById('filterUserSearch').value = nickname;
+            hideUserDropdown();
+        }
+
+        async function fetchReadings() {
+            const loading = document.getElementById('readingsLoading');
+            const items = document.getElementById('readingsItems');
+            const empty = document.getElementById('readingsEmpty');
+
+            loading.style.display = 'flex';
+            items.style.display = 'none';
+            empty.style.display = 'none';
+
+            try {
+                let url = `${API_BASE}/api/admin/readings?page=${readingsPagination.page}&limit=${readingsPagination.limit}`;
+                if (readingsFilters.userId) url += `&userId=${readingsFilters.userId}`;
+                if (readingsFilters.startDate) url += `&startDate=${readingsFilters.startDate}`;
+                if (readingsFilters.endDate) url += `&endDate=${readingsFilters.endDate}`;
+
+                const response = await fetch(url, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.status === 401) {
+                    logout();
+                    return;
+                }
+
+                const data = await response.json();
+                if (data.success) {
+                    readingsList = data.readings;
+                    readingsPagination = data.pagination;
+                    renderReadings();
+                } else {
+                    showToast(data.error || '获取解读记录失败', 'error');
+                }
+            } catch (error) {
+                console.error('获取解读记录失败:', error);
+                showToast('网络错误，请稍后重试', 'error');
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        function renderReadings() {
+            const items = document.getElementById('readingsItems');
+            const empty = document.getElementById('readingsEmpty');
+            const paginationInfo = document.getElementById('readingsPaginationInfo');
+            const prevBtn = document.getElementById('readingsPrevBtn');
+            const nextBtn = document.getElementById('readingsNextBtn');
+            const pageNumber = document.getElementById('readingsPageNumber');
+
+            if (readingsList.length === 0) {
+                items.style.display = 'none';
+                empty.style.display = 'block';
+            } else {
+                empty.style.display = 'none';
+                items.style.display = 'flex';
+                items.innerHTML = readingsList.map(reading => createReadingCard(reading)).join('');
+            }
+
+            paginationInfo.textContent = `共 ${readingsPagination.total} 条记录`;
+            pageNumber.textContent = `${readingsPagination.page} / ${readingsPagination.pages}`;
+            prevBtn.disabled = readingsPagination.page <= 1;
+            nextBtn.disabled = readingsPagination.page >= readingsPagination.pages;
+        }
+
+        function createReadingCard(reading) {
+            let cardsHtml = '';
+            let cards = [];
+            try {
+                cards = typeof reading.cards === 'string' ? JSON.parse(reading.cards) : reading.cards;
+            } catch (e) {}
+
+            if (Array.isArray(cards)) {
+                cardsHtml = cards.map((cardItem, idx) => {
+                    const card = cardItem.card || {};
+                    const isReversed = cardItem.isReversed === true;
+                    const cardName = card.name || '?';
+                    let displayName = cardName;
+                    
+                    // 如果是4字牌名，分成两行显示
+                    if (cardName.length === 4) {
+                        displayName = cardName.slice(0, 2) + '<br>' + cardName.slice(2, 4);
+                    }
+                    
+                    return `
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                        <div style="width: 60px; height: 100px; background: #1a1a2e; border-radius: 8px; border: 2px solid ${isReversed ? '#9ca3af' : '#b49157'}; display: flex; align-items: center; justify-content: center; font-size: 12px; text-align: center; padding: 4px;">
+                            ${displayName}
+                        </div>
+                        <span style="font-size: 11px; color: ${isReversed ? '#9ca3af' : '#b49157'};">
+                            ${isReversed ? '逆位' : '正位'}
+                        </span>
+                    </div>
+                `}).join('');
+            }
+
+            let spreadName = '';
+            if (reading.spread) {
+                try {
+                    const spread = typeof reading.spread === 'string' ? JSON.parse(reading.spread) : reading.spread;
+                    spreadName = spread.name || '';
+                } catch (e) {}
+            }
+
+            const cardId = 'card-' + reading.id;
+
+            return `
+                <div style="background: #0c0c0e; border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="width: 40px; height: 40px; border-radius: 50%; background: #1a1a2e; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                                ${reading.avatar ? `<img src="${reading.avatar}" style="width:100%;height:100%;object-fit:cover;">` : '👤'}
+                            </div>
+                            <div>
+                                <div style="font-weight: 600; color: #fff;">${reading.nickname || '匿名用户'}</div>
+                                <div style="font-size: 12px; color: #9ca3af;">${formatDate(reading.createdAt)}</div>
+                            </div>
+                        </div>
+                        ${spreadName ? `<span style="background: rgba(180,145,87,0.2); color: #b49157; padding: 4px 10px; border-radius: 4px; font-size: 12px;">${spreadName}</span>` : ''}
+                    </div>
+                    ${reading.question ? `
+                        <div style="margin-bottom: 16px;">
+                            <div style="font-size: 12px; color: #9ca3af; margin-bottom: 4px;">问题</div>
+                            <div style="background: #16161a; padding: 12px; border-radius: 8px; color: #d1d5db;">${reading.question}</div>
+                        </div>
+                    ` : ''}
+                    <div style="margin-bottom: 16px;">
+                        <div style="font-size: 12px; color: #9ca3af; margin-bottom: 8px;">抽到的牌</div>
+                        <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+                            ${cardsHtml || '<span style="color:#9ca3af;">暂无牌面信息</span>'}
+                        </div>
+                    </div>
+                    ${reading.interpretation ? `
+                        <div>
+                            <button onclick="toggleInterpretation('${cardId}')" style="width: 100%; padding: 10px; background: rgba(180,145,87,0.1); border: 1px solid rgba(180,145,87,0.3); border-radius: 8px; color: #b49157; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                <span id="${cardId}-btn-text">展开解读</span>
+                                <span id="${cardId}-btn-icon">▼</span>
+                            </button>
+                            <div id="${cardId}-content" style="display: none; margin-top: 12px;">
+                                <div style="font-size: 12px; color: #9ca3af; margin-bottom: 4px;">解读</div>
+                                <div style="background: #16161a; padding: 12px; border-radius: 8px; color: #d1d5db; white-space: pre-wrap; font-size: 13px; line-height: 1.6;">${reading.interpretation}</div>
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function toggleInterpretation(cardId) {
+            const content = document.getElementById(cardId + '-content');
+            const btnText = document.getElementById(cardId + '-btn-text');
+            const btnIcon = document.getElementById(cardId + '-btn-icon');
+            
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                btnText.textContent = '收起解读';
+                btnIcon.textContent = '▲';
+            } else {
+                content.style.display = 'none';
+                btnText.textContent = '展开解读';
+                btnIcon.textContent = '▼';
+            }
+        }
+
+        function applyReadingsFilters() {
+            readingsFilters.userId = document.getElementById('filterUserId').value;
+            readingsFilters.startDate = document.getElementById('filterStartDate').value;
+            readingsFilters.endDate = document.getElementById('filterEndDate').value;
+            readingsPagination.page = 1;
+            fetchReadings();
+        }
+
+        function resetReadingsFilters() {
+            document.getElementById('filterUserId').value = '';
+            document.getElementById('filterUserSearch').value = '';
+            document.getElementById('filterStartDate').value = '';
+            document.getElementById('filterEndDate').value = '';
+            readingsFilters = { userId: '', startDate: '', endDate: '' };
+            readingsPagination.page = 1;
+            fetchReadings();
+        }
+
+        function changeReadingsPage(delta) {
+            const newPage = readingsPagination.page + delta;
+            if (newPage >= 1 && newPage <= readingsPagination.pages) {
+                readingsPagination.page = newPage;
+                fetchReadings();
+            }
+        }
+
+        // ======= 额度明细 =======
+        let quotaDetailAllUsers = [];
+
+        async function showQuotaDetailUserDropdown() {
+            const kw = document.getElementById('quotaDetailSearch').value.trim().toLowerCase();
+            const dropdown = document.getElementById('quotaDetailUserDropdown');
+
+            if (quotaDetailAllUsers.length === 0) {
+                try {
+                    const res = await fetch(`${API_BASE}/api/admin/all-users`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        quotaDetailAllUsers = data.users || [];
+                    }
+                } catch (err) {
+                    console.error(err);
+                }
+            }
+
+            let list = quotaDetailAllUsers;
+            if (kw) {
+                list = list.filter((u) =>
+                    (u.nickname || '').toLowerCase().includes(kw) ||
+                    (u.id || '').toLowerCase().includes(kw) ||
+                    (u.openid || '').toLowerCase().includes(kw)
+                );
+            }
+
+            if (list.length === 0) {
+                dropdown.innerHTML = '<div style="padding:12px 14px;color:#9ca3af;font-size:13px;">没有匹配的用户</div>';
+            } else {
+                dropdown.innerHTML = list.slice(0, 50).map((u) =>
+                    `<div onclick="selectQuotaDetailUser('${u.id}','${(u.nickname || '未命名').replace(/'/g, "\\'")}')" style="padding:10px 14px;cursor:pointer;color:#e4e4e7;font-size:13px;border-bottom:1px solid rgba(255,255,255,0.03);">
+                        ${u.nickname || '未命名'} <span style="color:#6b7280;font-size:12px;">(${String(u.id || '').substring(0, 12)}...)</span>
+                    </div>`
+                ).join('');
+            }
+            dropdown.style.display = 'block';
+        }
+
+        function filterQuotaDetailUserDropdown() {
+            showQuotaDetailUserDropdown();
+        }
+
+        function selectQuotaDetailUser(userId, nickname) {
+            document.getElementById('quotaDetailUserId').value = userId;
+            document.getElementById('quotaDetailSearch').value = nickname;
+            document.getElementById('quotaDetailUserDropdown').style.display = 'none';
+            loadQuotaDetail();
+        }
+
+        async function loadQuotaDetail() {
+            let userId = document.getElementById('quotaDetailUserId').value;
+            if (!userId) {
+                // 尝试从搜索框内容推断
+                const kw = document.getElementById('quotaDetailSearch').value.trim();
+                if (!kw) {
+                    showToast('请选择或输入一个用户', 'error');
+                    return;
+                }
+                userId = kw;
+            }
+
+            document.getElementById('quotaDetailContent').style.display = 'none';
+            document.getElementById('quotaDetailEmpty').style.display = 'none';
+            document.getElementById('quotaDetailLoading').style.display = 'flex';
+
+            try {
+                const res = await fetch(`${API_BASE}/api/admin/users/${encodeURIComponent(userId)}/quota-detail`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.status === 401) { logout(); return; }
+
+                const data = await res.json();
+                if (!data.success) {
+                    document.getElementById('quotaDetailLoading').style.display = 'none';
+                    document.getElementById('quotaDetailEmpty').innerHTML =
+                        `<div class="icon">⚠️</div><p>${data.error || '获取失败'}</p>`;
+                    document.getElementById('quotaDetailEmpty').style.display = 'block';
+                    return;
+                }
+
+                renderQuotaDetail(data);
+            } catch (err) {
+                console.error(err);
+                document.getElementById('quotaDetailLoading').style.display = 'none';
+                document.getElementById('quotaDetailEmpty').innerHTML =
+                    `<div class="icon">⚠️</div><p>网络错误，请稍后重试</p>`;
+                document.getElementById('quotaDetailEmpty').style.display = 'block';
+            }
+        }
+
+        function renderQuotaDetail(data) {
+            document.getElementById('quotaDetailLoading').style.display = 'none';
+            document.getElementById('quotaDetailEmpty').style.display = 'none';
+            document.getElementById('quotaDetailContent').style.display = 'block';
+
+            const u = data.user;
+            const usagePercent = u.totalGranted > 0
+                ? Math.round((u.totalUsed / u.totalGranted) * 100)
+                : 0;
+
+            // 用户信息卡片
+            const userHtml = `
+                <div class="table-container" style="padding:24px;margin-bottom:24px;">
+                    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+                        <div style="width:56px;height:56px;border-radius:50%;background:#1a1a2e;display:flex;align-items:center;justify-content:center;font-size:24px;overflow:hidden;flex-shrink:0;">
+                            ${u.avatar ? `<img src="${u.avatar}" style="width:100%;height:100%;object-fit:cover;">` : '👤'}
+                        </div>
+                        <div style="flex:1;min-width:200px;">
+                            <div style="font-size:18px;font-weight:600;color:#fff;margin-bottom:4px;">
+                                ${u.nickname || '未命名用户'}
+                                <span class="level-badge level-${u.level}" style="margin-left:8px;display:inline-block;padding:3px 10px;border-radius:4px;font-size:12px;font-weight:500;background:${['入门','学徒','进阶','资深','大师'].includes(u.level) ? 'inherit' : '#4b5563'}">
+                                    ${u.level || '未知'}
+                                </span>
+                            </div>
+                            <div style="font-size:12px;color:#6b7280;">OpenID: ${u.openid || u.id}</div>
+                            <div style="font-size:12px;color:#6b7280;margin-top:2px;">注册: ${formatDate(u.createdAt)}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // 统计卡片
+            const statsHtml = `
+                <div class="stat-card">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-value">${u.currentQuota}</div>
+                    <div class="stat-label">当前剩余额度</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📤</div>
+                    <div class="stat-value">${u.totalUsed}</div>
+                    <div class="stat-label">累计消耗</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🎉</div>
+                    <div class="stat-value">${u.totalReward || 0}</div>
+                    <div class="stat-label">累计获得奖励</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🎁</div>
+                    <div class="stat-value">${u.totalGranted}</div>
+                    <div class="stat-label">累计获得额度</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-value">${usagePercent}%</div>
+                    <div class="stat-label">使用率</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📅</div>
+                    <div class="stat-value">${u.last7DaysUsed}</div>
+                    <div class="stat-label">近7天消耗</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🗓️</div>
+                    <div class="stat-value">${u.last30DaysUsed}</div>
+                    <div class="stat-label">近30天消耗</div>
+                </div>
+            `;
+
+            document.getElementById('quotaStatsGrid').innerHTML = userHtml + statsHtml;
+
+            // 每日消耗列表
+            const dailyHtml = data.dailyUsage && data.dailyUsage.length > 0
+                ? `<div class="level-chart">
+                    ${data.dailyUsage.map(function(d) {
+                        const counts = data.dailyUsage.map(function(x) { return x.count; });
+                        const max = Math.max.apply(null, counts);
+                        const percent = max > 0 ? Math.round((d.count / max) * 100) : 0;
+                        return `
+                        <div class="level-bar-row">
+                            <div class="level-bar-label" style="font-size:13px;color:#9ca3af;width:110px;">${d.date}</div>
+                            <div class="level-bar-track">
+                                <div class="level-bar-fill" style="width:${percent}%;background:linear-gradient(90deg,#b49157,#8c6d39);height:100%;transition:width .6s ease;"></div>
+                            </div>
+                            <div class="level-bar-count" style="font-size:13px;font-weight:600;color:#fff;width:60px;text-align:right;">${d.count} 次</div>
+                        </div>`;
+                    }).join('')}
+                   </div>`
+                : '<div class="empty"><div class="icon">📭</div><p>暂无每日消耗记录</p></div>';
+
+            document.getElementById('quotaDailyList').innerHTML = dailyHtml;
+
+            // 消耗明细表
+            const usageTable = document.getElementById('quotaUsageTable');
+            const usageBody = document.getElementById('quotaUsageBody');
+            const usageEmpty = document.getElementById('quotaUsageEmpty');
+
+            if (data.usageRecords && data.usageRecords.length > 0) {
+                usageTable.style.display = 'table';
+                usageEmpty.style.display = 'none';
+                usageBody.innerHTML = data.usageRecords.map(function(r) {
+                    var isReward = r.type === 'reward';
+                    var typeLabel = isReward
+                        ? '<span style="display:inline-block;padding:2px 10px;border-radius:4px;font-size:11px;font-weight:500;background:rgba(34,197,94,0.15);color:#22c55e;">奖励</span>'
+                        : '<span style="display:inline-block;padding:2px 10px;border-radius:4px;font-size:11px;font-weight:500;background:rgba(239,68,68,0.15);color:#ef4444;">消耗</span>';
+                    var desc = isReward
+                        ? (r.description || '连续签到奖励')
+                        : (r.question ? escapeHtml(r.question) : '<span style="color:#6b7280;">(未填写问题)</span>');
+                    var cardsCell = isReward
+                        ? '<span style="color:#6b7280;">-</span>'
+                        : (r.cards ? escapeHtml(r.cards.substring(0, 40)) + (r.cards.length > 40 ? '...' : '') : '-');
+                    var amountText = isReward
+                        ? '+' + r.amount
+                        : '-' + r.amount;
+                    var amountColor = isReward ? '#22c55e' : '#ef4444';
+                    return `
+                    <tr>
+                        <td>#${r.index}</td>
+                        <td>${typeLabel}</td>
+                        <td style="color:#d1d5db;">${desc}</td>
+                        <td style="color:#9ca3af;font-size:12px;">${cardsCell}</td>
+                        <td style="color:#9ca3af;font-size:12px;">${formatDate(r.createdAt)}</td>
+                        <td style="text-align:right;color:${amountColor};font-weight:600;">${amountText}</td>
+                    </tr>
+                `; }).join('');
+            } else {
+                usageTable.style.display = 'none';
+                usageEmpty.style.display = 'block';
+            }
+        }
+
+        function formatDate(d) {
+            if (!d) return '-';
+            const date = d instanceof Date ? d : new Date(d);
+            if (isNaN(date.getTime())) return String(d);
+            // 使用北京时间（Asia/Shanghai）展示，避免不同时区用户看到不同日期
+            try {
+                const parts = new Intl.DateTimeFormat('en-GB', {
+                    timeZone: 'Asia/Shanghai',
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false
+                }).formatToParts(date);
+                const obj = {};
+                for (let i = 0; i < parts.length; i++) {
+                    obj[parts[i].type] = parts[i].value;
+                }
+                return `${obj.year}-${obj.month}-${obj.day} ${obj.hour}:${obj.minute}`;
+            } catch (_) {
+                // 回退：手动加 8 小时后读 UTC 字段
+                const beijingMs = date.getTime() + 8 * 60 * 60 * 1000;
+                const bd = new Date(beijingMs);
+                const pad = (n) => String(n).padStart(2, '0');
+                return `${bd.getUTCFullYear()}-${pad(bd.getUTCMonth() + 1)}-${pad(bd.getUTCDate())} ${pad(bd.getUTCHours())}:${pad(bd.getUTCMinutes())}`;
+            }
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/[&<>"']/g, (c) => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            }[c]));
+        }
+
+        // 从用户管理页面跳转：查看指定用户的额度明细
+        function openQuotaDetailForUser(userId, nickname) {
+            document.getElementById('quotaDetailUserId').value = userId || '';
+            document.getElementById('quotaDetailSearch').value = nickname || '';
+            switchPage('quotaDetail');
+        }
+
+        // ======= Init =======
+        // 点击页面其他地方关闭用户下拉框
+        document.addEventListener('click', function(e) {
+            const searchInput = document.getElementById('filterUserSearch');
+            const dropdown = document.getElementById('userDropdown');
+            if (searchInput && dropdown && !searchInput.contains(e.target) && !dropdown.contains(e.target)) {
+                hideUserDropdown();
+            }
+            // 关闭额度明细用户下拉框
+            const qsInput = document.getElementById('quotaDetailSearch');
+            const qsDropdown = document.getElementById('quotaDetailUserDropdown');
+            if (qsInput && qsDropdown && !qsInput.contains(e.target) && !qsDropdown.contains(e.target)) {
+                qsDropdown.style.display = 'none';
+            }
+        });
+
+        checkAuth();
+    </script>
+</body>
+</html>
